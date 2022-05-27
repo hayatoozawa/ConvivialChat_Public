@@ -1,1 +1,1 @@
-window.__SKYWAY_KEY__ = 'SKYWAY_API_KEY';
+const newLocal = window.__SKYWAY_KEY__ = 'b45fe751-87df-43c4-8f18-d42491274ce4';
