@@ -595,14 +595,15 @@ let synth = window.speechSynthesis;
     //発言リクエストがクリックされた時//
     function RequestSend(e){
       e.preventDefault();
-      if(RequestChildren.value == ''){
+      if(Request.value == ''){
         console.log('value is null')
       }
       else{
-        let senddata3 = `${RequestChildren.value}さんがリクエストされました！`;
-        let sendDataSet3 = { name: Yourname.value, msg: senddata3, type: "send" };
-        room.send(sendDataSet3);
-        RequestChildren.value = '';
+        let senddata4 = `${Request.value}さんが発言リクエストされました！\n`;
+        let sendDataSet4 = { name: Yourname.value, msg: senddata4, type: "send" };
+        room.send(sendDataSet4);
+        Request.value = '';
+        messages.textContent +=`${senddata4}\n`
       }
        //チャットを一番下までスクロールさせる
        let scrollToBottom = () => {
