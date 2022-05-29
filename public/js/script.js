@@ -39,6 +39,9 @@ let synth = window.speechSynthesis;
   let uun = document.getElementById('uun');
   let ooo = document.getElementById('ooo');
   let hahaha = document.getElementById('hahaha');
+  let Request = document.getElementById('Request');
+  let RequestChildren = Request.children;
+  const sendTrigger3 = document.getElementById('js-send-trigger3');
 
   meta.innerText = `
     UA: ${navigator.userAgent}
@@ -99,6 +102,7 @@ let synth = window.speechSynthesis;
       selfItem.id = MypeerId;
       selfItem.textContent = Yourname.value;
       loginUsers.appendChild(selfItem);
+      
       //追加したコード：名前送れるかも
       // room.send(Yourname.value)
       room.send({ name: Yourname.value, type: "open" });
@@ -112,6 +116,14 @@ let synth = window.speechSynthesis;
             loginUsers.appendChild(items[i]);
           }
         }
+        let items2 = [];
+          for (i = 0; i < peers.length; i++) {
+          if (peers[i] !== MypeerId){
+            items2[i] = document.createElement('option');
+            items2[i].id = peers[i]; 
+            Request.appendChild(items2[i]);
+          }
+        }
 
       });
 
@@ -121,9 +133,11 @@ let synth = window.speechSynthesis;
 
     room.on('peerJoin', (peerId) => {
       let item = document.createElement('li');
+      let items2 = document.createElement('option');
       item.id = peerId;
+      items2.id = peerId;
       loginUsers.appendChild(item);
-
+      Request.appendChild(items2);
       let yourdata = { name: Yourname.value, type: "login"};
       room.send(yourdata);
 
@@ -186,10 +200,26 @@ let synth = window.speechSynthesis;
                   loginChildren[i].textContent = data.name;
                 }
               }
-            };
+            }
             createUsers();
-          });
+
+            let createOptions = () => {
+              if (RequestChildren.length < peers.length) {
+                setTimeout(createOptions, 1000);
+              }
+              for (i = 0; i < RequestChildren.length; i++) {
+                if (RequestChildren[i].id == src) {
+                  RequestChildren[i].textContent = data.name;
+                  RequestChildren[i].value = data.name;
+                }
+              }
+            }
+            createOptions();
+          })
+            
+          
           break;
+
         case 'say':
           let msg = new SpeechSynthesisUtterance();
           let Voices = synth.getVoices().filter(v => v.lang == "ja-JP");
@@ -228,6 +258,7 @@ let synth = window.speechSynthesis;
               loginChildren[i].textContent = data.name;
             }
           }
+
           for (i = 0; i < userAdd.length; i++) {
             if (userAdd[i].name == data.name) {
               userAdd = userAdd.splice(i, 1);
@@ -262,9 +293,12 @@ let synth = window.speechSynthesis;
           } else {
             messages.textContent += `=== ${data.name} が参加しました ===\n\n`;
           }
-
-          scrollToBottom();
+        
+          case 'openOption':
+            RequestChildren[RequestChildren.length - 1].textContent = data.name;
+            RequestChildren[RequestChildren.length - 1].value = data.name;
           break;
+
         case 'typing':
           for (i = 0; i < loginChildren.length; i++) {
             if (loginChildren[i].id == src && loginChildren[i].textContent == data.name) {
@@ -453,10 +487,25 @@ let synth = window.speechSynthesis;
       scrollToBottom();
     });
 
+    room.on('peerLeave', peerId => {
+      for (i = 0; i < RequestChildren.length; i++) {
+        if (RequestChildren[i].id == peerId) {
+          Request.removeChild(RequestChildren[i]);
+        }
+      }
+      //チャット下までスクロール
+      let scrollToBottom = () => {
+        messages.scrollTop = messages.scrollHeight;
+      };
+      scrollToBottom();
+    });
+
+
     // for closing myself
     room.once('close', () => {
       sendTrigger.removeEventListener('click', onClickSend);
       sendTrigger2.removeEventListener('click', onClickSend2);
+      sendTrigger3.removeEventListener('click', RequestSend);
       good.removeEventListener('click', SendReaction);
       heee.removeEventListener('click', SendReaction);
       uun.removeEventListener('click', SendReaction);
@@ -485,6 +534,7 @@ let synth = window.speechSynthesis;
     SpeechToText();
     sendTrigger.addEventListener('click', onClickSend);
     sendTrigger2.addEventListener('click', onClickSend2);
+    sendTrigger3.addEventListener('click', RequestSend);
     //以下メッセージ送信3種類の関数
     function onClickSend() {
       // Send message to all of the peers in the room via websocket
@@ -541,6 +591,27 @@ let synth = window.speechSynthesis;
         }
       }
     }
+
+    //発言リクエストがクリックされた時//
+    function RequestSend(e){
+      e.preventDefault();
+      if(RequestChildren.value == ''){
+        console.log('value is null')
+      }
+      else{
+        let senddata3 = `${RequestChildren.value}さんがリクエストされました！`;
+        let sendDataSet3 = { name: Yourname.value, msg: senddata3, type: "send" };
+        room.send(sendDataSet3);
+        RequestChildren.value = '';
+      }
+       //チャットを一番下までスクロールさせる
+       let scrollToBottom = () => {
+        messages.scrollTop = messages.scrollHeight;
+      };
+      scrollToBottom();
+    } 
+      
+    
     function SpeechToText() {
       recognition.onresult = (event) => {
         for (let i = event.resultIndex; i < event.results.length; i++) {
