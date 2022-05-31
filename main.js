@@ -10,7 +10,7 @@ Participant = require("./models/participant");
 mongoose.Promise = global.Promise;
 
 mongoose.connect(
-    process.env.MONGODB_URI || "mongodb+srv://hayato:YEWe8ku6lRmzlCsg@cluster0.da399.mongodb.net/?retryWrites=true&w=majority",
+    process.env.MONGODB_URI || "mongodb://localhost:27017/skyway_db",
     {useNewUrlParser: true, useUnifiedTopology: true,useFindAndModify:false,useCreateIndex:true}
   );
   
