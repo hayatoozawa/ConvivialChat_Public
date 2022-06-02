@@ -59,7 +59,7 @@ let synth = window.speechSynthesis;
     })
     .catch(console.error);
 
-  //マイクのオンオフ
+  //マイクのストリームのオンオフ
   const onoffSwitch = () => {
     let OnOff2 = document.getElementById("onoff2");
     let onoff2 = OnOff2.className;
@@ -70,7 +70,7 @@ let synth = window.speechSynthesis;
     }
   }
 
-  onoffSwitch();
+  setInterval(onoffSwitch,1000);
 
 
   // eslint-disable-next-line require-atomic-updates
@@ -201,7 +201,7 @@ let synth = window.speechSynthesis;
                   loginChildren[i].textContent = data.name;
                 }
               }
-            }
+            };
             createUsers();
 
             let createOptions = () => {
@@ -214,7 +214,7 @@ let synth = window.speechSynthesis;
                   RequestChildren[i].value = data.name;
                 }
               }
-            }
+            };
             createOptions();
           })
             
@@ -298,7 +298,8 @@ let synth = window.speechSynthesis;
           case 'openOption':
             RequestChildren[RequestChildren.length - 1].textContent = data.name;
             RequestChildren[RequestChildren.length - 1].value = data.name;
-          break;
+            scrollToBottom();
+            break;
 
         case 'typing':
           for (i = 0; i < loginChildren.length; i++) {
@@ -521,7 +522,7 @@ let synth = window.speechSynthesis;
       let StartConv = confirm("本当に退出しますか？");
       if (StartConv) {
         () => room.close(), { once: true }
-        window.location.href = "https://convivialchat.herokuapp.com/";
+        window.location.href = "https://request-button.herokuapp.com/";
       } else {
         return;
       }
